@@ -1,0 +1,195 @@
+// import React, { Component } from 'react';
+// import { Button, Text, View } from 'react-native';
+// import DropDownPicker from 'react-native-dropdown-picker';
+
+// export default class DropDownStates extends Component {
+//   constructor(props) {
+//     super(props);
+
+//     this.state = {
+//       items: [
+//         { label: 'Bert', value: 'Bert' },
+//         { label: 'Darius', value: 'Darius' },
+//         { label: 'Maggie', value: 'Maggie' },
+//         { label: 'Rebecca', value: 'Rebecca' },
+//         { label: 'Ruby', value: 'Ruby' },
+//         { label: 'Trent', value: 'Trent' },
+//       ],
+//       multiValue: null,
+//       open: false,
+//       singleValue: null,
+//     };
+
+//     this.setOpen = this.setOpen.bind(this);
+//     this.setSingleValue = this.setSingleValue.bind(this);
+//     this.setMultiValue = this.setMultiValue.bind(this);
+//     this.setItems = this.setItems.bind(this);
+//   }
+
+//   setOpen(open) {
+//     this.setState({
+//       open,
+//     });
+//   }
+
+//   setSingleValue(callback) {
+//     this.setState((state) => ({
+//       singleValue: callback(state.singleValue),
+//     }));
+//   }
+
+//   setMultiValue(callback) {
+//     this.setState((state) => ({
+//       multiValue: callback(state.multiValue),
+//     }));
+//   }
+
+//   setItems(callback) {
+//     this.setState((state) => ({
+//       items: callback(state.items),
+//     }));
+//   }
+
+//   render() {
+//     const { multiple } = this.props;
+//     const { open, singleValue, multiValue, items } = this.state;
+
+//     return (
+//       <View style={{ flex: 3 }}>
+        
+//         <View style={{ flex: 1 }}>
+//           {multiple ? (
+//             <DropDownPicker
+//               open={open}
+//               value={multiValue}
+//               items={items}
+//               setOpen={this.setOpen}
+//               setValue={this.setMultiValue}
+//               setItems={this.setItems}
+//               placeholder='Choose a name'
+//               multiple
+//               multipleText='You have chosen {count} names.'
+//             />
+//           ) : (
+//             <DropDownPicker
+//               open={open}
+//               value={singleValue}
+//               items={items}
+//               setOpen={this.setOpen}
+//               setValue={this.setSingleValue}
+//               setItems={this.setItems}
+//               placeholder='Choose a name'
+//               multiple={false}
+//             />
+//           )}
+//         </View>
+
+ 
+//       </View>
+//     );
+//   }
+// }
+import React, { Component } from 'react';
+import { View, Text, styles } from 'react-native';
+import DropDownPicker from 'react-native-dropdown-picker';
+
+export default class DropDownStates extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      items: [
+        { label: 'Alabama', value: 'AL' },
+        { label: 'Alaska', value: 'AK' },
+        { label: 'Arizona', value: 'AZ' },
+        { label: 'Arkansas', value: 'AR' },
+        { label: 'California', value: 'CA' },
+        { label: 'Colorado', value: 'CO' },
+        { label: 'Connecticut', value: 'CT' },
+        { label: 'Delaware', value: 'DE' },
+        { label: 'Florida', value: 'FL' },
+        { label: 'Georgia', value: 'GA' },
+        { label: 'Hawaii', value: 'HI' },
+        { label: 'Idaho', value: 'ID' },
+        { label: 'Illinois', value: 'IL' },
+        { label: 'Indiana', value: 'IN' },
+        { label: 'Iowa', value: 'IA' },
+        { label: 'Kansas', value: 'KS' },
+        { label: 'Kentucky', value: 'KY' },
+        { label: 'Louisiana', value: 'LA' },
+        { label: 'Maine', value: 'ME' },
+        { label: 'Maryland', value: 'MD' },
+        { label: 'Massachusetts', value: 'MA' },
+        { label: 'Michigan', value: 'MI' },
+        { label: 'Minnesota', value: 'MN' },
+        { label: 'Mississippi', value: 'MS' },
+        { label: 'Missouri', value: 'MO' },
+        { label: 'Montana', value: 'MT' },
+        { label: 'Nebraska', value: 'NE' },
+        { label: 'Nevada', value: 'NV' },
+        { label: 'New Hampshire', value: 'NH' },
+        { label: 'New Jersey', value: 'NJ' },
+        { label: 'New Mexico', value: 'NM' },
+        { label: 'New York', value: 'NY' },
+        { label: 'North Carolina', value: 'NC' },
+        { label: 'North Dakota', value: 'ND' },
+        { label: 'Ohio', value: 'OH' },
+        { label: 'Oklahoma', value: 'OK' },
+        { label: 'Oregon', value: 'OR' },
+        { label: 'Pennsylvania', value: 'PA' },
+        { label: 'Rhode Island', value: 'RI' },
+        { label: 'South Carolina', value: 'SC' },
+        { label: 'South Dakota', value: 'SD' },
+        { label: 'Tennessee', value: 'TN' },
+        { label: 'Texas', value: 'TX' },
+        { label: 'Utah', value: 'UT' },
+        { label: 'Vermont', value: 'VT' },
+        { label: 'Virginia', value: 'VA' },
+        { label: 'Washington', value: 'WA' },
+        { label: 'West Virginia', value: 'WV' },
+        { label: 'Wisconsin', value: 'WI' },
+        { label: 'Wyoming', value: 'WY' },
+      ],
+      open: false,
+      singleValue: null,
+      multiValue: [],
+    };
+
+    this.setOpen = this.setOpen.bind(this);
+    this.setSingleValue = this.setSingleValue.bind(this);
+    this.setMultiValue = this.setMultiValue.bind(this);
+  }
+
+  setOpen(open) {
+    this.setState({ open });
+  }
+
+  setSingleValue(value) {
+    this.setState({ singleValue: value });
+  }
+
+  setMultiValue(values) {
+    this.setState({ multiValue: values });
+  }
+
+  render() {
+    const { multiple, placeholder, labelText } = this.props;
+    const { open, singleValue, multiValue, items } = this.state;
+
+    return (
+      <View style={{ flex: 1 }}>
+        <Text>{labelText}</Text>
+        <DropDownPicker
+          open={open}
+          value={multiple ? multiValue : singleValue}
+          items={items}
+          setOpen={this.setOpen}
+          setValue={multiple ? this.setMultiValue : this.setSingleValue}
+          placeholder={placeholder}
+          multiple={multiple}
+          multipleText='{count} states selected'
+        />
+      </View>
+    );
+  }
+}

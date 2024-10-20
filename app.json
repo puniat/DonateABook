@@ -1,0 +1,56 @@
+{
+  "expo": {
+    "name": "DonateABook",
+    "slug": "DonateABook",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./app/components/assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./app/components/assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      },
+      "bundleIdentifier": "com.puniat.GiftABook"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./app/components/assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "permissions": [
+        "android.permission.INTERNET",
+        "android.permission.ACCESS_NETWORK_STATE",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.RECORD_AUDIO"
+      ]
+    },
+    "web": {
+      "favicon": "./app/components/assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends."
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "db887424-42fa-4695-a592-9cda09a78b4c"
+      }
+    }
+  }
+}
