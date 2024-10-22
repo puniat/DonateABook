@@ -5,17 +5,16 @@
 CREATE TABLE IF NOT EXISTS public.user_profiles
 (
     id integer NOT NULL DEFAULT nextval('user_profiles_id_seq'::regclass),
-    user_id integer NOT NULL,  -- Foreign key to users table
-    phone character varying(20) COLLATE pg_catalog."default",
-    profile_picture character varying(255) COLLATE pg_catalog."default",  -- Optional for user-uploaded profile picture
-    biography text,  -- Optional for users to write about themselves
+    user_id integer NOT NULL,
+    profile_picture character varying(255) COLLATE pg_catalog."default" NULL,  -- Set to NULL
+    biography text COLLATE pg_catalog."default" NULL,  -- Set to NULL
     created_at timestamp without time zone DEFAULT now(),
     updated_at timestamp without time zone DEFAULT now(),
     CONSTRAINT user_profiles_pkey PRIMARY KEY (id),
     CONSTRAINT user_profiles_user_id_fkey FOREIGN KEY (user_id)
         REFERENCES public.users (id) MATCH SIMPLE
         ON UPDATE NO ACTION
-        ON DELETE CASCADE  -- Delete user profile if the user is deleted
+        ON DELETE CASCADE
 )
 
 TABLESPACE pg_default;

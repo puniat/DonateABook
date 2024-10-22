@@ -43,9 +43,9 @@ const HomepageScreen = ({ navigation }) => {
   };
 
    return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#ffd60a' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#ecccc1' }}>
       <View style={[styles.topcontainer]}>
-        {<ImageViewer placeholderImageSource={require('../components/Images/Top-Header.jpg')} />}
+        {<ImageViewer placeholderImageSource={require('../components/Images/book3.jpg')} />}
       </View>
       <View style={[styles.topcontainer]}>
         {/* Display the welcome message with the user's name */}

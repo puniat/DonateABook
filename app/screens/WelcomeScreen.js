@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 const WelcomeScreen = () => {
   const [activeTab, setActiveTab] = useState('signIn');
   const navigation = useNavigation();
+  
 
   // Handlers for button press
   const handleSignIn = () => {
@@ -27,25 +28,33 @@ const WelcomeScreen = () => {
         {/* Title and Welcome Message */}
         <Text style={styles.title}>Welcome to DonateABook!</Text>
         <Text style={styles.message}>
-          Free Books, Endless Stories                  Give What You Can, Take What You Love!        
+        Free Books, Endless Stories{'\n'}Give What You Can, Take What You Love!
         </Text>
 
         {/* Tabs for Sign In and Create Account */}
         <View style={styles.tabsContainer}>
           <TouchableOpacity
-            style={[styles.tab, activeTab === 'signIn' && styles.activeTab]}
+            style={[styles.tab, activeTab === 'signIn' ]}
             onPress={handleSignIn} // Handle Sign In button press
           >
-            <Text style={styles.tabText}>Sign In</Text>
+            <Text style={styles.tabText}>Log In</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.tab, activeTab === 'createAccount' && styles.activeTab]}
+            style={[styles.tab, activeTab === 'createAccount' ]}
             onPress={handleCreateAccount} // Handle Create Account button press
           >
-            <Text style={styles.tabText}>Create Account</Text>
+            <Text style={styles.tabText}>Sign Up</Text>
           </TouchableOpacity>
+
         </View>
+        <View>
+      <Text style={styles.messagebottom}>
+      Join our community of readers and givers.{'\n'}
+      Your contribution makes a lasting impact.
+        </Text>
       </View>
+      </View>
+
     </ImageBackground>
   );
 };
@@ -71,12 +80,22 @@ const styles = StyleSheet.create({
     color: '#fff', // Adjusted for better readability on the background
   },
   message: {
-    fontSize: 20, // Set to a value between 18 and 24 pixels
+    fontSize: 18, // Set to a value between 18 and 24 pixels
     fontFamily: 'sans-serif', // Use sans-serif font
-    color: '#d62828', // Set to the specified color
+    color: '#003566', // Set to the specified color
     marginBottom: 20,
     marginTop: 20,
     textAlign: 'center',
+    fontWeight: 'bold',
+  },
+  messagebottom: {
+    fontSize: 16, // Set to a value between 18 and 24 pixels
+    fontFamily: 'sans-serif', // Use sans-serif font
+    color: '#003566', // Set to the specified color
+    //marginBottom: 20,
+    marginTop: 430,
+    textAlign: 'justified',
+    fontWeight: 'bold',
   },
   tabsContainer: {
     flexDirection: 'row',

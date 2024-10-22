@@ -7,6 +7,7 @@ import CustomDropdown from '../components/CustomDropdown';
 import CustomTextBox from '../components/CustomTextBox';
 import { BOOK_CONDITION, BOOKGENRE, BOOKGRADES } from '../components/Constants'
 
+
 const AddBook = ({ navigation }) => {
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
@@ -34,7 +35,7 @@ const AddBook = ({ navigation }) => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [4, 3],
+      //aspect: [4, 3],
       quality: 0.5,
     });
 
@@ -45,7 +46,7 @@ const AddBook = ({ navigation }) => {
     const result = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [4, 3],
+      //aspect: [4, 3],
       quality: 0.5,
     });
 

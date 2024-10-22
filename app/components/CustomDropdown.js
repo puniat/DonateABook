@@ -26,7 +26,7 @@ const CustomDropdown = ({
         multiple={multiple}
         multipleText="{count} selected"
         onChangeValue={(selectedValue) => {
-          console.log("Dropdown value changed:", selectedValue);
+          //console.log("Dropdown value changed:", selectedValue);
           onChangeValue(selectedValue); // Ensure this calls the parent handler
       }}
       style={styles.dropdown}

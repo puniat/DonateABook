@@ -132,7 +132,7 @@ app.get('/users/check/password', async (req, res) => {
 // Retrieve all books
 app.use('/uploads', express.static('uploads'));
 app.get('/booksList', async (req, res) => {
-  console.log('Server side: user entered booksList');
+  //console.log('Server side: user entered booksList');
   try {
     // Query all books from the database
     const result = await pool.query('SELECT * FROM books');

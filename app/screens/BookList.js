@@ -1,48 +1,49 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { bookListing } from '../apiCalls'; // Assuming this function exists
 
 const BookList = ({ navigation }) => {
-  const [books, setBooks] = useState({});
+  const [books, setBooks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+
   const formatPicturePath = (path) => path.replace(/\\/g, '/');
 
   const fetchBooks = async () => {
     try {
       const allBooks = await bookListing();
-      // ** Group books by genre and sort both genres and books within each genre **
       const groupedBooks = allBooks.reduce((acc, book) => {
         const genre = book.genre;
-        // Group books by genre
         if (!acc[genre]) {
           acc[genre] = [];
         }
-        acc[genre].push({ ...book, genre });
+        acc[genre].push(book);
         return acc;
       }, {});
 
-      // ** Sort genres alphabetically **
-      const sortedGenres = Object.keys(groupedBooks).sort();
-      // ** Sort books within each genre by title **
-      const sortedBooks = sortedGenres.reduce((acc, genre) => {
-        acc[genre] = groupedBooks[genre].sort((a, b) => a.title.localeCompare(b.title));
-        return acc;
-      }, {});
+      // Map genres to sections with their books
+      const sections = Object.keys(groupedBooks).sort().map(genre => ({
+        title: genre,
+        data: groupedBooks[genre].sort((a, b) => a.title.localeCompare(b.title)) // Sort books by title within each genre
+      }));
 
-      setBooks(sortedBooks);
+      setBooks(sections);
     } catch (error) {
       console.error('Error fetching books:', error);
     } finally {
       setIsLoading(false);
     }
   };
-  
+
   useEffect(() => {
     fetchBooks();
   }, []);
 
   if (isLoading) {
-    return <ActivityIndicator size="large" style={styles.loadingIndicator} />;
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#c1121f" />
+      </View>
+    );
   }
 
   const renderBookItem = ({ item }) => (
@@ -54,76 +55,99 @@ const BookList = ({ navigation }) => {
         source={{ uri: `http://192.168.1.20:3000/${formatPicturePath(item.picturepath)}` }}
         style={styles.bookItemImage}
         resizeMode="cover"
-        resizeMethod="auto"
       />
-      <Text style={styles.bookItemTitle}>{item.title}</Text>
+      <Text style={styles.bookItemTitle} numberOfLines={2}>{item.title}</Text>
     </TouchableOpacity>
   );
 
-  const renderGenreHeader = ({ item }) => (
-    <View style={styles.genreHeader}>
-      <Text style={styles.genreHeaderText}>{item}</Text>
+  const renderGenreItem = ({ item }) => (
+    <View style={styles.genreContainer}>
+      <Text style={styles.genreHeaderText}>{item.title}</Text>
+      <FlatList
+        data={item.data} // Books for each genre
+        renderItem={renderBookItem}
+        horizontal={true}
+        showsHorizontalScrollIndicator={true}
+        keyExtractor={(bookItem) => bookItem.id.toString()}
+        contentContainerStyle={styles.horizontalListContainer}
+      />
     </View>
   );
 
   return (
-    <FlatList
-      
-      data={Object.keys(books)} // Get genre keys
-      keyExtractor={(item) => item}
-      renderItem={({ item }) => (
-        <View style={styles.genreContainer}>
-          {renderGenreHeader({ item })}
-          <FlatList
-            data={books[item]} // Books for each genre
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={renderBookItem}
-            horizontal={true}
-            showsHorizontalScrollIndicator={true}
-          />
-        </View>
-      )}
-    />
+    <View style={styles.container}>
+      <FlatList
+        data={books}
+        keyExtractor={(item) => item.title}
+        renderItem={renderGenreItem} // Render both genre header and books
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.mainListContainer}
+      />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  loadingIndicator: {
+  container: {
+    flex: 1,
+    backgroundColor: '#f7f7f7', // Set a background color
+  },
+  loaderContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    
   },
   bookItem: {
-    padding: 4,
-    marginHorizontal: 8,
+    width: 120, // Fixed width for the card
+    height: 200, // Fixed height for the card
+    padding: 8,
+    marginHorizontal: 12,
     alignItems: 'center',
+    borderRadius: 10,
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
   },
   bookItemImage: {
-    width: 80,
-    height: 100,
+    width: 100, // Slightly smaller than the card width
+    height: 140, // Maintain a good ratio for the image
     borderRadius: 10,
-    marginTop: 4,
+    marginBottom: 8,
   },
   bookItemTitle: {
     textAlign: 'center',
     fontSize: 12,
-    color: '#c1121f',
-    fontWeight: 'bold',
-    width: 80,
+    color: '#333',
+    fontWeight: '600',
+    width: 100, // Ensure the title stays within the card width
   },
   genreContainer: {
-    paddingVertical: 4,
-  },
-  genreHeader: {
-    padding: 10,
-    borderRadius: 10,
-    //width: '50%',
+    marginVertical: 10,
+    borderRadius: 10, // Ensures the container has rounded corners
+    overflow: 'hidden', // Prevents overflow of children
+    backgroundColor: '#fff', // Background color for the container
   },
   genreHeaderText: {
-    color: '#c1121f',
-    fontSize: 18,
+    backgroundColor: '#c1121f',
+    color: '#fff',
+    paddingVertical: 10, // Adds vertical padding
+    paddingHorizontal: 16, // Adds horizontal padding
+    fontSize: 20,
     fontWeight: 'bold',
-    textAlign: 'center'
+    textAlign: 'center',
+    borderTopLeftRadius: 10, // Round top left corner
+    borderTopRightRadius: 10, // Round top right corner
+  },
+  mainListContainer: {
+    paddingBottom: 50,
+  },
+  horizontalListContainer: {
+    paddingVertical: 10,
+    
   },
 });
 

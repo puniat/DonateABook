@@ -69,9 +69,9 @@ export const COUNTRY = [
     { label: 'Activity Books', value: 'Activity Books' },
     { label: 'Art and Music Books', value: 'Art and Music Books' },
     { label: 'Biographies and Memoirs', value: 'Biographies and Memoirs' },
-    { label: 'Childrens Books', value: 'Childrens Books' },
+    { label: "Children's Books", value: "Children's Books" },
     { label: 'Classics', value: 'Classics' },
-    { label: 'Comic Book or Graphic Novel', value: 'Graphic Novel' },
+    { label: 'Comic Book or Graphic Novel', value: 'Comic Book or Graphic Novel' },
     { label: 'Cookbooks', value: 'cookbooks' },
   //  { label: 'Detective and Mystery', value: 'detective_and_mystery' },
     { label: 'Educational Magazines', value: 'Educational Magazines' },
@@ -117,4 +117,6 @@ export const COUNTRY = [
     { label: 'College', value: 'College' },
     { label: 'Young Kids', value: 'Yound-Kids' },
     { label: 'Teens', value: 'Teens' },
+    { label: 'High School', value: 'High School' },
+    { label: 'Middle School', value: 'Middle School' },
   ]

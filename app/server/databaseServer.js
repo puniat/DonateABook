@@ -4,15 +4,14 @@ const { Pool } = pkg;
 import bodyParser from 'body-parser';
 import multer from 'multer';
 import path from 'path';
-import { fileURLToPath } from 'url'; // For resolving directory in ES Modules
 import { v4 as uuidv4 } from 'uuid';
 import bcrypt from 'bcrypt';
 import session from 'express-session';
 import nodemailer from 'nodemailer';
 
 import cors from 'cors'; // ** Added CORS for cross-origin requests **
-
 import dotenv from 'dotenv'; // ** Added dotenv to manage environment variables **
+
 
 // Configure environment variables
 dotenv.config();
@@ -51,6 +50,7 @@ app.use(cors({
 
 // Improved session handling for better security and performance
 app.use(session({
+  //TBD to change before publishing
   secret: process.env.SESSION_SECRET || 'xxas23%##$&gh12345', // ** Use environment variable for session secret **
   resave: false,
   saveUninitialized: false,
@@ -69,7 +69,9 @@ app.get('/users/check/email', async (req, res) => {
     const userExists = userExistsResult.rowCount > 0;
     if (userExists) {
       const userid = userExistsResult.rows[0].id;
+      //console.log('Received request - UserID:', userid);
       const userEmail = email;
+      //console.log('Received request - userEmail:', userEmail);
       const userFirstName = userExistsResult.rows[0].first_name;
       req.session.userId = userid;
       req.session.email = userEmail;
@@ -115,7 +117,9 @@ app.use('/uploads', express.static('uploads'));
 app.get('/booksList', async (req, res) => {
   console.log('Server side: user entered booksList');
   try {
-    const result = await pool.query('SELECT * FROM books');
+    const { page = 1, limit = 30 } = req.query;
+    const offset = (page - 1) * limit;
+    const result = await pool.query('SELECT * FROM books LIMIT $1 OFFSET $2', [limit, offset]);
     res.json(result.rows);
   } catch (error) {
     console.error('Error retrieving books:', error);
@@ -125,15 +129,30 @@ app.get('/booksList', async (req, res) => {
 
 // Save new user
 app.post('/signup', async (req, res) => {
-  console.log('SERVER-SIDE: /signup:', req.query);
-  const { firstName, lastName, email, password, address, state, zipcode, country } = req.body;
+  console.log('Server side: user entered User Signup');
+  const { firstName, lastName, email, password, address, state, zipcode, country, profile_picture, biography } = req.body;
+  if (!firstName || !lastName || !email || !password) {
+    return res.status(400).json({ error: 'Missing required fields' }); // Handle missing fields
+  }
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-    await pool.query(
-      'INSERT INTO users (first_name, last_name, email, password, address, state, zipcode, country) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
+    //userid is returned by postgres query if switch to firebase then it will not work
+    const result = await pool.query(
+      'INSERT INTO users (first_name, last_name, email, password, address, state, zipcode, country) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id',
       [firstName, lastName, email, hashedPassword, address, state, zipcode, country]
     );
-    res.json({ message: 'User created successfully' });
+    // Capture and return the user_id
+    const userId = result.rows[0].id;
+    req.session.userId = userId;
+    req.session.email = email;
+    req.session.firstName = firstName;
+    
+    // Step 2: Create the user profile in the user_profiles table
+    await pool.query(
+     `INSERT INTO public.user_profiles (user_id, profile_picture, biography) VALUES ($1, $2, $3)`,
+        [userId, profile_picture || null, biography || null]  // Use null if not provided
+      );
+    res.json({ message: 'User created successfully', userId });
   } catch (error) {
     console.error('Error saving user:', error);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -163,7 +182,7 @@ const upload = multer({
 
 // Add Books
 app.post('/books/add', upload.single('image'), async (req, res) => {
-  console.log('SERVER SIDE == Inside /books/add');
+  //console.log('SERVER SIDE == Inside /books/add');
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded' });
   }
@@ -214,16 +233,54 @@ app.get('/books/search', async (req, res) => {
   }
 });
 
+
+
+// API to request a book
+app.post('/books/request', async (req, res) => {
+  const userId = req.session.userId;
+  const { bookId } = req.body;
+  try {
+      // Fetch book owner details
+      const bookQuery = await pool.query('SELECT title, donated_by FROM books WHERE id = $1', [bookId]);
+      if (bookQuery.rows.length > 0) {
+
+        const bookOwnerId = bookQuery.rows[0]?.donated_by;
+        const bookTitle = bookQuery.rows[0].title;
+        //console.log('Received request - bookOwnerId:', bookOwnerId, 'bookTitle:', bookTitle);
+        if (bookOwnerId) {
+            const userQuery = await pool.query('SELECT email, first_name FROM users WHERE id = $1', [bookOwnerId]);
+            const bookOwnerEmail = userQuery.rows[0]?.email;
+            const bookOwnerName = userQuery.rows[0]?.first_name;
+
+            const userRequestQuery = await pool.query('SELECT email, first_name FROM users WHERE id = $1', [userId]);
+            const userRequestEmail = userRequestQuery.rows[0]?.email;
+            const userRequestName = userRequestQuery.rows[0]?.first_name;
+
+            sendEmail(bookOwnerEmail, userRequestEmail, userRequestName, bookTitle);
+            res.json({ message: 'Request sent successfully!' });
+        } else {
+            res.status(404).json({ error: 'Book owner not found' });
+        }
+      } else {
+        console.error('Book not found');
+      }
+  } catch (error) {
+      console.error('Error sending book request:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 // Send email for users for selected books
 const sendEmail = (bookOwnerEmail, userRequestEmail, userRequestName, bookTitle) => {
+  //console.log('Email:', bookOwnerEmail, userRequestEmail, userRequestName, bookTitle);
   const mailOptions = {
       from: process.env.EMAIL_USER,
       to: bookOwnerEmail,
-      subject: `DonateABook - Approve Book Request: ${bookTitle}`,
+      subject: `DonateABook - Approve Donation Request for: ${bookTitle}`,
       text: `Dear DonateABook User,\n
-We hope you're doing well! One of our users, ${userRequestName}, is interested in picking up the book you've generously offered to donate through DonateABook. Here's their contact information:\n
-Email: ${userRequestEmail}\n
-If you approve the request, your mobile number will be shared with ${userRequestName} to coordinate for the pickup.\n
+We hope you're doing well! One of our users, ${userRequestName}, is interested in picking up the book - '${bookTitle}' you've generously offered to donate through DonateABook. Here's is${userRequestName}  contact information:\n
+User's Email: ${userRequestEmail}\n
+If you approve the request, your email will be shared with ${userRequestName} to coordinate for the pickup.\n
 To approve this request, simply log in to your DonateABook account and navigate to your donation dashboard.\n
 Thank you so much for contributing to our community! Your continued generosity makes a huge difference in helping others access the books they need.\n
 Warm Regards,\n
@@ -237,34 +294,6 @@ The DonateABook Team`
       }
   });
 };
-
-// API to request a book
-app.post('/books/request', async (req, res) => {
-  const { userId, bookId } = req.body;
-  try {
-      const bookQuery = await pool.query('SELECT donated_by FROM books WHERE id = $1', [bookId]);
-      const bookOwnerId = bookQuery.rows[0]?.donated_by;
-
-      if (bookOwnerId) {
-          const userQuery = await pool.query('SELECT email, first_name FROM users WHERE id = $1', [bookOwnerId]);
-          const bookOwnerEmail = userQuery.rows[0]?.email;
-          const bookOwnerName = userQuery.rows[0]?.first_name;
-
-          const userRequestQuery = await pool.query('SELECT email, first_name FROM users WHERE id = $1', [userId]);
-          const userRequestEmail = userRequestQuery.rows[0]?.email;
-          const userRequestName = userRequestQuery.rows[0]?.first_name;
-
-          sendEmail(bookOwnerEmail, userRequestEmail, userRequestName, bookId);
-          res.json({ message: 'Request sent successfully!' });
-      } else {
-          res.status(404).json({ error: 'Book owner not found' });
-      }
-  } catch (error) {
-      console.error('Error sending book request:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
 // ** New API to retrieve user profile **
 app.get('/users/profile', async (req, res) => {
   const userId = req.session.userId;

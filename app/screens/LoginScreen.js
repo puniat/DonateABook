@@ -5,8 +5,10 @@ import { checkIfUserExistsByEmail, validateUserPassword } from '../apiCalls';
 import CustomButton from '../components/CustomButton';
 import COLORS from '../config/colors';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // For storing user dat
+import { useUser } from '../../UserContext';
 
 const LoginScreen = ({ navigation }) => {
+  const { setUser } = useUser(); // Access setUser from context
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
@@ -37,15 +39,15 @@ const LoginScreen = ({ navigation }) => {
 
     try {
         //const emailExists = await checkIfUserExistsByEmail(email);
-        const { emailExists, name } = await checkIfUserExistsByEmail(email);
+        const { emailExists, userId } = await checkIfUserExistsByEmail(email);
         //console.log('LoginScreen - emailExists:', emailExists);
         
         if (!emailExists) {
             setEmail('');
             setPassword('');
-            setMessage('User does not exist. Please register.');
-            await AsyncStorage.setItem('userId', response.userId);
-            await AsyncStorage.setItem('username', response.name); // Save username if needed
+            setMessage('User does not exist. Please Sign Up from welcome screen.');
+            //await AsyncStorage.setItem('userId', response.userId);
+            //await AsyncStorage.setItem('username', response.name); // Save username if needed
             return;
         }
 
@@ -56,7 +58,7 @@ const LoginScreen = ({ navigation }) => {
             setMessage('Incorrect email or password, please try again.');
             return;
         }
-
+        setUser({ userId, email }); // Set user information in context
         // Successful login, redirect to Home page
         navigation.navigate('HomePage');
         
@@ -72,7 +74,7 @@ const LoginScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
       <ImageBackground
-        source={require('../components/Images/BrainBuddies-4.jpg')}
+        source={require('../components/Images/Homepage.jpg')}
         style={{ flex: 1, resizeMode: 'cover', justifyContent: 'center', paddingHorizontal: 10 }}
         blurRadius={0.6}
       >
@@ -133,14 +135,14 @@ const LoginScreen = ({ navigation }) => {
 
           {message !== '' && (
             <View style={{ marginBottom: 20, alignItems: 'center' }}>
-              <Text style={{ color: 'black', fontWeight: 'bold', textAlign: 'center' }}>
+              <Text style={{ color: 'red', borderRadius: '4px', backgroundColor: 'white', fontWeight: 'bold', textAlign: 'center' }}>
                 {message}
               </Text>
             </View>
           )}
           {/* Login Button */}
           <CustomButton
-            title="Login for free books"
+            title="Login - Donate or Get Free books"
             filled
             style={{ marginTop: 18, marginBottom: 20 }}
             onPress={handleLogin}

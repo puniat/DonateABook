@@ -3,37 +3,16 @@ import React, { useState, useEffect } from 'react';
 import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, Alert} from 'react-native';
 import ImageViewer from '../components/ImageViewer'; // Assuming this component exists
 import BookList from './BookList'
-import AsyncStorage from '@react-native-async-storage/async-storage'; // For storing user data
+import { useUser } from '../../UserContext';
+import { Ionicons } from '@expo/vector-icons';
+
 
 const HomepageScreen = ({ navigation }) => {
+  const { user } = useUser();
   const [refresh, setRefresh] = useState(false);
-  const [username, setUsername] = useState('');
-  const [userId, setUserId] = useState(''); // State to store userId
-
-  // Fetch the user's name from storage or an API
-  useEffect(() => {
-    const getUserInfo = async () => {
-      try {
-        const storedUsername = await AsyncStorage.getItem('username');
-        const storedUserId = await AsyncStorage.getItem('userId'); // Retrieve userId
-        if (storedUsername) {
-          setUsername(storedUsername);
-        }
-        if (storedUserId) {
-          setUserId(storedUserId); // Set userId state
-        }
-      } catch (error) {
-        console.log('Error retrieving user data:', error);
-      }
-    };
-
-    getUserInfo();
-  }, []);
-
+ 
   // Function to handle logout
   const handleLogout = () => {
-    // Perform any necessary logout logic here (e.g., clearing tokens)
-    AsyncStorage.clear(); // Clear all stored data
 
     // Navigate back to the login screen
     navigation.reset({
@@ -42,10 +21,19 @@ const HomepageScreen = ({ navigation }) => {
     });
   };
 
+    // Navigate to Profile Page
+    const goToProfile = () => {
+      navigation.navigate('UserProfile'); // Make sure to have a 'Profile' screen in your navigation
+    };
+
    return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#ffd60a' }}>
+    <SafeAreaView style={{ flex: 1 }}>
       <View style={[styles.topcontainer]}>
-        {<ImageViewer placeholderImageSource={require('../components/Images/Welcome.jpg')} />}
+        {<ImageViewer placeholderImageSource={require('../components/Images/Welcome-page1.jpg')} />}
+        {/* Profile Icon Button */}
+        <TouchableOpacity style={styles.profileButton} onPress={goToProfile}>
+          <Ionicons name="person-circle-outline" size={40} color="#2a9d8f" />
+        </TouchableOpacity>
       </View>
       <View style={styles.middleContainer}>
         <Text style={styles.headerText}>Search Books</Text>
@@ -64,10 +52,10 @@ const HomepageScreen = ({ navigation }) => {
       </TouchableOpacity>
         </View>
         <TouchableOpacity 
-          style={[styles.addBookButton, { backgroundColor: '#e76f51' }]} 
+          style={[styles.addBookButton, { backgroundColor: '#023e8a' }]} 
           onPress={() => navigation.navigate('AddBook')}
         >
-          <Text style={styles.buttonText}>Add New Book</Text>
+          <Text style={styles.buttonText}>Add New Book To Donate</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.bottomContainer}>
@@ -92,7 +80,12 @@ const HomepageScreen = ({ navigation }) => {
     bottomContainer: {
       flex: 1,
       padding: 16,
-      //backgroundColor: '#eaeaea',
+    },
+    profileButton: {
+      position: 'absolute',
+      top: 10,
+      right: 10,
+      
     },
     loadingIndicator: {
       flex: 1,

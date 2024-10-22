@@ -47,23 +47,27 @@ const Address = () => {
             return value && value.trim() !== '';
         });
     };
-    const handlecreateaccount = async () => {
-        if (!validateInputs()) {
-            setMessage('All fields are required.');
-            return;
+ // Front-end logic: Handle create account and navigate to UserProfile screen
+const handlecreateaccount = async () => {
+    if (!validateInputs()) {
+        setMessage('All fields are required.');
+        return;
+    }
+    try {
+        const response = await saveUser(formData);
+
+        if (response && response.userId) {
+            // Navigate to UserProfile screen and pass userId in params
+            //navigation.navigate('UserProfile', { userId: response.userId });
+                navigation.navigate('HomePage');
+        } else {
+            throw new Error('Empty response data or userId missing');
         }
-        try {
-            const response = await saveUser(formData);
-            if (response) {
-                //navigation.navigate('HomePage');
-                navigation.navigate('UserProfile');
-            } else {
-                throw new Error('Empty response data');
-            }
-        } catch (error) {
-            console.error('Error signing up:', error);
-        }
-    };
+    } catch (error) {
+        console.error('Error creating account:', error);
+        setMessage('There was an error creating your account. Please try again.');
+    }
+};
     return (
         <SafeAreaView style={styles.container}>
         <View style={styles.innerContainer}>

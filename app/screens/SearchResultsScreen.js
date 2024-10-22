@@ -78,7 +78,9 @@ const SearchResultsScreen = ({ route, navigation }) => {
             />
             <View style={styles.bookDetails}>
                 <Text style={styles.bookTitle}>{item.title}</Text>
-                <Text style={styles.bookGenre}>{item.genre}</Text>
+                <Text style={styles.bookAuthor}>By: {item.author}</Text>
+                <Text style={styles.bookGenre}>Genre: {item.genre}</Text>
+                
                 <TouchableOpacity
                     style={styles.requestButton}
                     onPress={() => handleRequestBook(item)}
@@ -196,6 +198,12 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: COLORS.black,
         marginBottom: 5,
+    },
+    bookAuthor: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: '#fb8500',
+        marginBottom: 10,
     },
     bookGenre: {
         fontSize: 14,

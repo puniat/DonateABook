@@ -1,5 +1,6 @@
 import React from 'react';
 import { TextInput, View, StyleSheet } from 'react-native';
+import COLORS from '../config/colors';
 
 
 const CustomTextBox = ({ label, value, placeholder, onChangeText, secureTextEntry }) => {
@@ -13,6 +14,7 @@ const CustomTextBox = ({ label, value, placeholder, onChangeText, secureTextEntr
               value={value}
               onChangeText={onChangeText}
               secureTextEntry={secureTextEntry}
+
             />
         </View>
     );
@@ -40,6 +42,8 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     marginBottom: 2,
     marginTop: 15,
+    backgroundColor: COLORS.white,
+    color: COLORS.black,
   },
   placeholder: {
     color: '#999', // Example: sets placeholder text color to gray
